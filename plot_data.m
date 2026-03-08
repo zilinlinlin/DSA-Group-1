@@ -1,5 +1,5 @@
 %% load variables
-load("data\long log.mat")
+load("data\walk2.mat")
 
 %% plot map
 geoplot(Position.latitude, Position.longitude);

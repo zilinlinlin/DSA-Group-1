@@ -2,26 +2,26 @@ geobasemap streets
 
 Position.Timestamp   = datetime(Position.Timestamp);
 Acceleration.Timestamp = datetime(Acceleration.Timestamp);
-Orientation.Timestamp  = datetime(Orientation.Timestamp);
+AngularVelocity.Timestamp  = datetime(AngularVelocity.Timestamp);
 
 % round timestamps
 Position.Timestamp = dateshift(Position.Timestamp,'start','second');
 Acceleration.Timestamp = dateshift(Acceleration.Timestamp,'start','second');
-Orientation.Timestamp  = dateshift(Orientation.Timestamp,'start','second');
+AngularVelocity.Timestamp  = dateshift(AngularVelocity.Timestamp,'start','second');
 %calculate magnitude
-Orientation.gmag = sqrt(Orientation.X.^2 + Orientation.Y.^2 + Orientation.Z.^2);
+AngularVelocity.gmag = sqrt(AngularVelocity.X.^2 + AngularVelocity.Y.^2 + AngularVelocity.Z.^2);
 Acceleration.accmag = sqrt(Acceleration.X.^2 + Acceleration.Y.^2 + Acceleration.Z.^2);
 
 PositionResampled = retime(Position, 'secondly', 'mean');
 AccelerationResampled = retime(Acceleration(:, "accmag"), 'secondly', 'mean');
-dataTable = synchronize(Position, Acceleration(:, "accmag"), Orientation(:, "gmag"), 'intersection');
-shakeThresh = 50;
-spinThresh  = 200; %test value
-stillThresh = 5; %test value
+dataTable = synchronize(Position, Acceleration(:, "accmag"), AngularVelocity(:, "gmag"), 'intersection');
+shakeThresh = 70;
+spinThresh  = 12; %test value
+stillThresh = 0.01; %test value
 
 shake = (dataTable.accmag > shakeThresh);
 spin = (dataTable.gmag > spinThresh);
-still = (dataTable.accmag < stillThresh);
+still = (dataTable.speed < stillThresh);
 
 % Plot spin, shake and still detected locations
 hold on;
