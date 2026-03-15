@@ -66,4 +66,4 @@ end
 geobasemap streets
 
 title('Location Map')
-legend('Restaurants','Candidate Points')
+legend('Main Points','Passing Points')
