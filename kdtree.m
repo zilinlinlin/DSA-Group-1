@@ -73,7 +73,7 @@ function print_kdtree(tree, indent)
         print_kdtree(tree.left, indent + 12);
     end
 end
-nodes = [Lon,Lat,Name];
+nodes = [lon,lat,names];
 tree = build_kdtree(nodes, 0);
 print_kdtree(tree);
 
