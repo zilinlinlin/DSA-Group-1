@@ -161,3 +161,60 @@ function d = haversine_dist(lat1, lon1, lat2, lon2)
     c = 2 * atan2(sqrt(a), sqrt(1-a));
     d = R * c; % Distance in meters
 end
+%% Question 9
+target_name = string(input('Enter the location you want to know information for:\n', 's'));
+switch target_name
+    case "Marshgate"
+        disp('--- UCL Marshgate Summary ---');
+        disp('- Flagship Building: The massive centerpiece of the new UCL East campus in Stratford, London, opened in 2023.');
+        disp('- Collaborative Vibe: Mixes engineering, robotics, architecture, and creative arts in one space to encourage teamwork.');
+        disp('- Design & Tech: Features a huge open atrium, high-tech fabrication labs, and top-tier sustainability ratings.');
+        disp('- Publicly Accessible: The lower floors are open to the community, featuring a cafe, library, and exhibition spaces.');
+        disp('-----------------------------');
+        
+    case "One Pool Street"
+        disp('--- One Pool Street Summary ---');
+        disp('- UCL East Hub: The first building to open on the new UCL East campus (2022).');
+        disp('- Mixed Use: Combines cutting-edge academic labs, a cinema, and student accommodation on the upper floors.');
+        disp('- Key Facilities: Houses the Robotics and Autonomous Systems lab and global ecology spaces.');
+        disp('- Community Focus: Features public cafes, art installations, and open collaborative areas.');
+        disp('-------------------------------');
+        
+    case "Itsu"
+        disp('--- Itsu Summary ---');
+        disp('- Cuisine: Asian-inspired fast food focusing on sushi, salads, and hot noodle/rice bowls.');
+        disp('- Vibe: Quick, healthy, and modern. Great for a light lunch between lectures.');
+        disp('- Perks: Famous among students for their half-price evening sale to reduce food waste.');
+        disp('--------------------');
+        
+    case "Waitrose"
+        disp('--- Waitrose Summary ---');
+        disp('- Type: Premium British supermarket located in nearby Westfield Stratford.');
+        disp('- Offerings: High-quality groceries, fresh bakery, and a popular lunchtime meal deal.');
+        disp('- Vibe: A bit more upmarket, perfect for grabbing fresh ingredients or a nice study snack.');
+        disp('------------------------');
+        
+    case "McDonalds"
+        disp('--- McDonalds Summary ---');
+        disp('- Type: Classic, globally recognized fast-food chain.');
+        disp('- Offerings: Burgers, fries, chicken nuggets, and cheap coffee.');
+        disp('- Vibe: Fast, affordable, and incredibly convenient for a quick bite or late-night fuel.');
+        disp('-------------------------');
+        
+    case "Caffe Nero"
+        disp('--- Caffe Nero Summary ---');
+        disp('- Type: Popular European-style coffee house chain.');
+        disp('- Offerings: Premium espresso drinks, hot paninis, and sweet pastries.');
+        disp('- Vibe: Cozy and relaxed. A great off-campus spot for a caffeine fix or pulling out a laptop to study.');
+        disp('--------------------------');
+        
+    case "Greggs"
+        disp('--- Greggs Summary ---');
+        disp('- Type: Iconic, budget-friendly British bakery chain.');
+        disp('- Offerings: Famous for sausage rolls, steak bakes, sandwiches, and sweet treats.');
+        disp('- Vibe: Casual, cheap, and cheerful. An absolute staple for student life in the UK.');
+        disp('----------------------');
+    
+    otherwise
+        disp("Location unavailable")
+end
