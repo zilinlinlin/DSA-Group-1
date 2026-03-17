@@ -265,8 +265,9 @@ function prompt_question3(graph)
     endNode = string(input("to... ","s"));
     fprintf("\nWhat is the estimated time from %s to %s?\n", startNode, endNode);
     shortest_distance = question2(graph, startNode, endNode);
-    shortest_time_mins = round(shortest_distance/1.5/60, 0); %average human walking speed is 1.5m/s
-    shortest_time_seconds = rem(shortest_distance/1.5, 60);%remaining seconds
+    walking_speed_mps = 1.4; % meters per second
+    shortest_time_mins = round(shortest_distance/walking_speed_mps/60, 0);
+    shortest_time_seconds = rem(shortest_distance/walking_speed_mps, 60);%remaining seconds
     fprintf("Estimated time from %s to %s is %.0f minutes %.0f seconds", startNode, endNode, shortest_time_mins, shortest_time_seconds);
 end
 
@@ -310,11 +311,36 @@ function currentPosition = prompt_question8(graph, currentPosition)
     currentPosition = question1(graph, currentPosition, random_place);
     currentPosition = random_place;
 end
+
+%%Question 10 - Is A or B closer to me?
+function currentPosition = question10(graph, startNode, pointA, pointB)
+    distance_from_A = question2(graph, startNode, pointA);
+    distance_from_B = question2(graph, startNode, pointB);
+    fprintf("Distance to %s: %.2fm\n", pointA, distance_from_A);
+    fprintf("Distance to %s: %.2fm\n", pointB, distance_from_B);
+    if (distance_from_A > distance_from_B)
+       fprintf("%s is closer. Here is how to get to %s:", pointA, pointA);
+       question1(graph, startNode, pointA);
+       currentPosition = pointA;
+    else
+       fprintf("%s is closer. Here is how to get to %s: ", pointB, pointB);
+       question1(graph, startNode, pointB);
+       currentPosition = pointB;
+    end
+end
+function currentPosition = prompt_question10(graph, currentPosition)
+    pointA = string(input("Is...","s"));
+    pointB = string(input("or... ","s"));
+    fprintf("closer to me?\n");
+    fprintf("Is %s or %s closer to me?\n", pointA, pointB);
+    fprintf("You are currently at %s\n", currentPosition);
+    currentPosition = question10(graph, currentPosition, pointA, pointB);
+end
 %%main
 disconnect = false;
 currentPosition = "Marshgate"; %starts at Marshgate
 while ~disconnect
-    question = input("Hi! I'm your very trustworthy navigation robot. What would you like to ask me?\n1) (Traverse) How do I get from ... to ...?\n2) (Info) What is the shortest distance from ... to ...?\n3) (Info) What is the estimated time from ... to ...?\n7) (Traverse) How do I get back to the nearest waiting point?\n8) (Traverse) Take me anywhere!\nChoose a question: ");
+    question = input("Hi! I'm your very trustworthy navigation robot. What would you like to ask me?\n1) (Traverse) How do I get from ... to ...?\n2) (Info) What is the shortest distance from ... to ...?\n3) (Info) What is the estimated time from ... to ...?\n7) (Traverse) How do I get back to the nearest waiting point?\n8) (Traverse) Take me anywhere!\n10) (Traverse) Is A or B closer to me?\nChoose a question: ");
     
     if (question == 1)
         currentPosition = prompt_question1(graph);
@@ -329,7 +355,11 @@ while ~disconnect
                     currentPosition = prompt_question7(graph, currentPosition);
                 else
                     if (question == 8)
-                    currentPosition = prompt_question8(graph, currentPosition);
+                        currentPosition = prompt_question8(graph, currentPosition);
+                    else
+                        if (question == 10)
+                            currentPosition = prompt_question10(graph, currentPosition);
+                        end
                     end
                 end
             end
