@@ -182,6 +182,7 @@ function currentPosition = question1(graph, startNode, endNode)
         end
     end
     fprintf("reached %s", endNode);
+    currentPosition = endNode;
 end
 function currentPosition = prompt_question1(graph)
     startNode = string(input("How do I get from... ","s"));
@@ -290,11 +291,30 @@ function currentPosition = prompt_question7(graph, currentPosition)
     fprintf("You are currently at %s\n", currentPosition);
     currentPosition = question7(graph, currentPosition);
 end
+%%Question 8 - Take me anywhere!
+function currentPosition = prompt_question8(graph, currentPosition)
+    rng("shuffle");
+    fprintf("Take me anywhere! \n");
+    fprintf("You are currently at %s\n", currentPosition);
+    random_choice = randi([1 7]);
+    disp(random_choice);
+    places = ["Marshgate", "One Pool Street", "Itsu", "Waitrose", "McDonald's", "Caffè Nero", "Greggs", "P1", "P2", "P3", "P4", "P5", "P6", "P7","P8", "P9", "P10"];
+    random_place = places(random_choice);
+    disp(random_place)
+    while random_place == currentPosition %makes sure it doesnt choose same place
+        rng("shuffle");
+        random_choice = randi([1 7]);
+        random_place = places(random_choice);
+    end
+    fprintf("Let's go to %s", random_place);
+    currentPosition = question1(graph, currentPosition, random_place);
+    currentPosition = random_place;
+end
 %%main
 disconnect = false;
 currentPosition = "Marshgate"; %starts at Marshgate
 while ~disconnect
-    question = input("Hi! I'm your very trustworthy navigation robot. What would you like to ask me?\n1) (Traverse) How do I get from ... to ...?\n2) (Info) What is the shortest distance from ... to ...?\n3) (Info) What is the estimated time from ... to ...?\n7) (Traverse) How do I get back to the nearest waiting point?\nChoose a question: ");
+    question = input("Hi! I'm your very trustworthy navigation robot. What would you like to ask me?\n1) (Traverse) How do I get from ... to ...?\n2) (Info) What is the shortest distance from ... to ...?\n3) (Info) What is the estimated time from ... to ...?\n7) (Traverse) How do I get back to the nearest waiting point?\n8) (Traverse) Take me anywhere!\nChoose a question: ");
     
     if (question == 1)
         currentPosition = prompt_question1(graph);
@@ -307,6 +327,10 @@ while ~disconnect
             else
                 if (question == 7)
                     currentPosition = prompt_question7(graph, currentPosition);
+                else
+                    if (question == 8)
+                    currentPosition = prompt_question8(graph, currentPosition);
+                    end
                 end
             end
         end
