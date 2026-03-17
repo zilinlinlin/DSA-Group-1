@@ -1,23 +1,5 @@
 % Names
-names = {
-'Marshgate'
-'One Pool Street'
-'Itsu'
-'Waitrose'
-'McDonalds'
-'Caffe Nero'
-'Greggs'
-'P1'
-'P2'
-'P3'
-'P4'
-'P5'
-'P6'
-'P7'
-'P8'
-'P9'
-'P10'
-};
+names = ["Marshgate";"One Pool Street";"Itsu";"Waitrose";"McDonalds";"Caffe Nero";"Greggs";"P1";"P2";"P3";"P4";"P5";"P6";"P7";"P8";"P9";"P10"];
 
 % Data: [Latitude Longitude Type]
 data = [
