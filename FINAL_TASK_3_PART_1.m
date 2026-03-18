@@ -51,7 +51,7 @@ nodes = ["Marshgate", ...
          "Itsu", ...
          "Waitrose", ...
          "McDonald's", ...
-         "Caffè Nero", ...
+         "Cafe Nero", ...
          "Greggs", ...
          "P1", ...
          "P2", ...
@@ -98,13 +98,31 @@ for i = 1:3:numel(Connections)
     graph = add_connection(graph, fromNode, toNode, weight);
     graph = add_connection(graph, toNode, fromNode, weight);
 end
-
+data = [
+51.53780  -0.01155  1
+51.53870  -0.00972  1
+51.54190  -0.00920  1
+51.54380  -0.00876  1
+51.54360  -0.00596  1
+51.54280  -0.00544  1
+51.54300  -0.00490  1
+51.53820  -0.01152  0
+51.54060  -0.01188  0
+51.54080  -0.01082  0
+51.53850  -0.00855  0
+51.54210  -0.00875  0
+51.54090  -0.00676  0
+51.54270  -0.00756  0
+51.54390  -0.00667  0
+51.54270  -0.00463  0
+51.54330  -0.00537  0
+];
 %%Initialise KD Tree
 lat = data(:,1);
 lon = data(:,2);
 type = data(:,3);
 
-names = ["Marshgate";"One Pool Street";"Itsu";"Waitrose";"McDonald's";"Caffe Nero";"Greggs";"P1";"P2";"P3";"P4";"P5";"P6";"P7";"P8";"P9";"P10"];
+names = ["Marshgate";"One Pool Street";"Itsu";"Waitrose";"McDonald's";"Cafe Nero";"Greggs";"P1";"P2";"P3";"P4";"P5";"P6";"P7";"P8";"P9";"P10"];
 
 %%Initialise KD Tree
 function node = build_kdtree(points, names, depth)
@@ -618,34 +636,109 @@ switch target_name
 end
 end
 %%Question 10 - Is A or B closer to me?
-function currentPosition = question10(graph, startNode, pointA, pointB)
+function question10(graph, startNode, pointA, pointB)
     distance_from_A = question2(graph, startNode, pointA);
     distance_from_B = question2(graph, startNode, pointB);
     fprintf("Distance to %s: %.2fm\n", pointA, distance_from_A);
     fprintf("Distance to %s: %.2fm\n", pointB, distance_from_B);
     if (distance_from_A > distance_from_B)
-       fprintf("%s is closer. Here is how to get to %s:", pointA, pointA);
-       question1(graph, startNode, pointA);
-       currentPosition = pointA;
+       fprintf("%s is closer.", pointA);
+       question2(graph, startNode, pointA);
     else
-       fprintf("%s is closer. Here is how to get to %s: ", pointB, pointB);
-       question1(graph, startNode, pointB);
-       currentPosition = pointB;
+       fprintf("%s is closer.", pointB);
+       question2(graph, startNode, pointB);
     end
 end
-function currentPosition = prompt_question10(graph, currentPosition)
+function prompt_question10(graph, currentPosition)
     pointA = string(input("Is...","s"));
     pointB = string(input("or... ","s"));
     fprintf("closer to me?\n");
     fprintf("Is %s or %s closer to me?\n", pointA, pointB);
     fprintf("You are currently at %s\n", currentPosition);
-    currentPosition = question10(graph, currentPosition, pointA, pointB);
+    question10(graph, currentPosition, pointA, pointB);
+end
+%%BONUS- SHOW ME A MAP
+function display_map(data, lat, lon, type, names)
+lat1 = lat(type==1);
+lon1 = lon(type==1);
+
+lat0 = lat(type==0);
+lon0 = lon(type==0);
+
+% Create geographic plot
+figure
+geoscatter(lat1,lon1,80,'red','filled')
+hold on
+geoscatter(lat0,lon0,80,'blue','filled')
+
+% Add labels
+for i = 1:length(names)
+    text(lat(i),lon(i),names{i},'FontSize',8)
+end
+distances = [];
+% Map style
+geobasemap streets
+title('Location Map')
+legend('Main Points','Passing Points')
+%correspond points to data
+marshgate = [data(1,1), data(1,2)];
+ops = [data(2,1), data(2,2)];
+itsu = [data(3,1), data(3,2)];
+waitrose = [data(4,1), data(4,2)];
+mcdonalds = [data(5,1), data(5,2)];
+nero = [data(6,1), data(6,2)];
+greggs = [data(7,1), data(7,2)];
+p1 = [data(8,1), data(8,2)];
+p2 = [data(9,1), data(9,2)];
+p3 = [data(10,1), data(10,2)];
+p4 = [data(11,1), data(11,2)];
+p5 = [data(12,1), data(12,2)];
+p6 = [data(13,1), data(13,2)];
+p7 = [data(14,1), data(14,2)];
+p8 = [data(15,1), data(15,2)];
+p9 = [data(16,1), data(16,2)];
+p10 = [data(17,1), data(17,2)];
+distance = [plot_distance(marshgate, p1);
+    plot_distance(p1, ops);
+    plot_distance(ops, p2);
+    plot_distance(ops, p3);
+    plot_distance(ops, p4);
+    plot_distance(p2, itsu);
+    plot_distance(p3, itsu);
+    plot_distance(itsu, p5);
+    plot_distance(p5, p6);
+    plot_distance(p5, p7)
+    plot_distance(p4, p6);
+    plot_distance(p6, p9);
+    plot_distance(p7, nero);
+    plot_distance(p7, mcdonalds);
+    plot_distance(p7, waitrose);
+    plot_distance(nero, p9);
+    plot_distance(p9, greggs);
+    plot_distance(greggs, p10);
+    plot_distance(waitrose, p8);
+    plot_distance(p8, mcdonalds);
+    plot_distance(mcdonalds, p10)];
+end
+function dist = plot_distance(point1, point2)
+hold on
+    lat1 = point1(1);
+    lon1 = point1(2);
+    lat2 = point2(1);
+    lon2 = point2(2);
+    arclen = distance(lat1,lon1,lat2,lon2);
+    dist = deg2km(arclen)*1000; %distance in metres
+    midLat = (lat1+lat2)/2;
+    midLon = (lon1+lon2)/2;
+    
+    geoplot([lat1 lat2], [lon1 lon2], 'k-');
+    text(midLat,midLon,sprintf('%f m',dist),'FontSize',7, 'FontWeight','normal', 'Color', 'black');
 end
 %%main
 disconnect = false;
 currentPosition = "Marshgate"; %starts at Marshgate
 while ~disconnect
-    question = input("Hi! I'm your very trustworthy navigation robot. What would you like to ask me?\n1) (Traverse) How do I get from ... to ...?\n2) (Info) What is the shortest distance from ... to ...?\n3) (Info) What is the estimated time from ... to ...?\n7) (Traverse) How do I get back to the nearest waiting point?\n8) (Traverse) Take me anywhere!\n10) (Traverse) Is A or B closer to me?\nChoose a question: ");
+    question = input("Hi! I'm your very trustworthy navigation robot. What would you like to ask me?\n1) (Traverse) How do I get from ... to ...?\n2) (Info) What is the shortest distance from ... to ...?\n3) (Info) What is the estimated time from ... to ...?\n4) (Info) What is the closest point to A?\n5) (Info) What is the estimated time to the closest point to A?\n6) (Info) What are the three closest points to A?\n7) (Traverse) How do I get back to the nearest waiting point?\n8) (Traverse) Take me anywhere!\n9) (Info)Tell me more about A\n10) (Info) Is A or B closer to me?\n11) [BONUS] Show me a map!\nChoose a question: ");
     switch question
 
     case 1
@@ -676,10 +769,10 @@ while ~disconnect
         prompt_question9();
 
     case 10
-        currentPosition = prompt_question10(graph, currentPosition);
+        prompt_question10(graph, currentPosition);
 
     case 11
-        display_map();
+        display_map(data, lat, lon, type, names);
 
     otherwise
         fprintf("Invalid question number\n");
