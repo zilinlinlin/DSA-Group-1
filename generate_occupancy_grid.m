@@ -9,4 +9,4 @@ map = occupancyMap(bw, 0.7634);
 show(map);
 title('Occupancy Grid');
 
-save('occupancyGridMap.mat', 'map');
+save('occupancyGridMap.mat', 'map', "bw");
