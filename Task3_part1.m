@@ -197,8 +197,6 @@ if isempty(target_idx)
 end
 end
 
-% Extract target coordinates [Lon, Lat]
-target_point = [lon(target_idx), lat(target_idx)];
 
 % Define average walking speed
 walking_speed_mps = 1.4; % meters per second
