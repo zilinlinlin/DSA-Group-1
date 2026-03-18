@@ -41,7 +41,7 @@ plot(scaledX(data(:, 3) == 1), scaledY(data(:, 3) == 1), 'ro', 'MarkerSize', 5,M
 plot(scaledX(data(:, 3) == 0), scaledY(data(:, 3) == 0), 'bo', 'MarkerSize', 5,MarkerFaceColor='b'); % Type 0
 
 robot_pos = [495,1020];
-target = [518,524];
+target = [1019,134];
 
 [robot_pos(1), robot_pos(2)] = deal(robot_pos(2), robot_pos(1));
 [target(1), target(2)] = deal(target(2), target(1));
@@ -54,7 +54,6 @@ while ~isequal(robot_pos, target)
     h.XData = robot_pos(2) * 1.30979;
     h.YData = (1053 - robot_pos(1)) * 1.30979;
     pause(0.01); % Pause for visualization
-    disp(robot_pos)
 end
 
 hold off
