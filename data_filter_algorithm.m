@@ -1,4 +1,6 @@
-geobasemap streets
+
+figure;
+geobasemap("streets");
 
 Position.Timestamp   = datetime(Position.Timestamp);
 Acceleration.Timestamp = datetime(Acceleration.Timestamp);
@@ -17,17 +19,19 @@ AccelerationResampled = retime(Acceleration(:, "accmag"), 'secondly', 'mean');
 dataTable = synchronize(Position, Acceleration(:, "accmag"), AngularVelocity(:, "gmag"), 'intersection');
 shakeThresh = 70;
 spinThresh  = 12; %test value
-stillThresh = 0.01; %test value
+stillThresh = 4; %test value
 
 shake = (dataTable.accmag > shakeThresh);
 spin = (dataTable.gmag > spinThresh);
-still = (dataTable.speed < stillThresh);
+still = (dataTable.accmag < stillThresh);
 
 % Plot spin, shake and still detected locations
 hold on;
+
 geoscatter(dataTable.latitude(shake), dataTable.longitude(shake), 50, 'r', 'filled')
 geoplot(Position.latitude, Position.longitude);
 geoscatter(dataTable.latitude(spin), dataTable.longitude(spin), 50, 'b', 'filled')
 geoscatter(dataTable.latitude(still), dataTable.longitude(still), 50, 'y', 'filled')
-title('Shake/Spin Detected Locations')
+title('Shake/Spin/Still Detected Locations')
+
 
