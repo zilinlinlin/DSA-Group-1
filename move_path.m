@@ -1,10 +1,10 @@
-function move_from_to(from, to)
+function move_path(path)
     load("occupancyGridMap.mat");
     
     % scale factor 1.30979 
     % conversion = x*sf, (1053-y)*sf
     
-    names = ["Marshgate";"One Pool Street";"Itsu";"Waitrose";"McDonalds";"Caffe Nero";"Greggs";"P1";"P2";"P3";"P4";"P5";"P6";"P7";"P8";"P9";"P10"];
+    names = ["Marshgate";"One Pool Street";"Itsu";"Waitrose";"McDonald's";"Caffe Nero";"Greggs";"P1";"P2";"P3";"P4";"P5";"P6";"P7";"P8";"P9";"P10"];
     
     % Data: [x y lat lon type]
     data = [
@@ -50,24 +50,31 @@ function move_from_to(from, to)
         text(lat(i),lon(i),names{i},'FontSize',8)
     end
 
-    idx_from = names == from;
-    idx_to = names == to;
-    
+    idx_from = names == path(1);
+        
     robot_pos = data(idx_from, 1:2);
-    target = data(idx_to, 1:2);
-    
     [robot_pos(1), robot_pos(2)] = deal(robot_pos(2), robot_pos(1));
-    [target(1), target(2)] = deal(target(2), target(1));
-    
+
     p = geoscatter(-0.000006539212292*robot_pos(1) + 51.544470183547240, 0.000010653595386*robot_pos(2) -0.016781643846851, 120,'green','filled');
     
-    legend('Main Points','Passing Points', 'Robot')
-
-    while ~isequal(robot_pos, target)
-        robot_pos = move_to_target(bw, robot_pos, target);
-        p.XData = -0.000006539212292*robot_pos(1) + 51.544470183547240;
-        p.YData = 0.000010653595386*robot_pos(2) -0.016781643846851;
-        pause(0.01); % Pause for visualization
+    for i = 1:length(path)-1   
+        idx_from = names == path(i);
+        idx_to = names == path(i+1);
+        
+        robot_pos = data(idx_from, 1:2);
+        target = data(idx_to, 1:2);
+        
+        [robot_pos(1), robot_pos(2)] = deal(robot_pos(2), robot_pos(1));
+        [target(1), target(2)] = deal(target(2), target(1));
+                
+        legend('Main Points','Passing Points', 'Robot')
+    
+        while ~isequal(robot_pos, target)
+            robot_pos = move_to_target(bw, robot_pos, target);
+            p.XData = -0.000006539212292*robot_pos(1) + 51.544470183547240;
+            p.YData = 0.000010653595386*robot_pos(2) -0.016781643846851;
+            pause(0.001); % Pause for visualization
+        end
     end
     
     hold off
