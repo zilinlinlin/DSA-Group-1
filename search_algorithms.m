@@ -139,13 +139,13 @@ function bfs(graph, startNode, endNode)
         end
 
         visited(end+1) = currentNode;
-        fprintf("Visited: %s (distance: %.2f)\n", currentNode, currentDist);
+        fprintf("Visited: %s (distance: %.2fm)\n", currentNode, currentDist);
         totalDist = totalDist + currentDist;
 
         % Stop if end node reached
         if currentNode == endNode
-           fprintf("Visited: %s (distance: %.4f)\n", char(currentNode), currentDist);
-            fprintf("Total distance traveled: %.4f\n", totalDist);
+            fprintf("Reached end node: %s\n", endNode);
+            fprintf("Total distance traveled: %.4fm\n", totalDist);
             return
         end
 
@@ -209,7 +209,7 @@ function dijkstra(graph, startNode, endNode)
         % Stop if end node reached
         if currentName == endNode
             fprintf("Reached end node: %s\n", endNode);
-            fprintf("Shortest distance to %s : %.4f\n", endNode, dist(u));
+            fprintf("Shortest distance to %s : %.4fm\n", endNode, dist(u));
             return
         end
 
@@ -277,7 +277,7 @@ function dijkstra_heap(graph, startNode, endNode)
         % stop if end node reached
         if currentName == endNode
             fprintf("Reached end node: %s\n", endNode);
-            fprintf("Shortest distance to %s : %.4f\n", endNode, dist(u));
+            fprintf("Shortest distance to %s : %.4fm\n", endNode, dist(u));
             return
         end
 
