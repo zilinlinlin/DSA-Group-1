@@ -131,24 +131,23 @@ function node = build_kdtree(points, names, depth)
         return;
     end
 
-    % 1. Determine Axis based on depth
-    % Depth 0 -> Axis 1 (X)
-    % Depth 1 -> Axis 2 (Y)
-    % Depth 2 -> Axis 1 (X) ...
+    % Determine Axis based on depth
+    % Depth 0 -> Axis 1 (Lon)
+    % Depth 1 -> Axis 2 (Lat)
+    % Depth 2 -> Axis 1 (Lon) ...
     k = 2; % Dimensions (2D)
     axis = mod(depth, k) + 1;
     
-    % 2. Sort points by the current axis
-    % sortrows(points, axis) sorts the matrix based on the column 'axis'
+    % Sort points by the current axis
     sorted_points = sortrows(points, axis);
     
-    % 3. Find Median
+    % Find Median
     n = size(sorted_points, 1);
-    median_idx = floor(n / 2) + 1; % Selects middle element
+    median_idx = floor(n / 2) + 1;
     median_point = [sorted_points(median_idx, 1), sorted_points(median_idx, 2)];
     name = names(median_idx);
     
-    % 4. Create Node
+    % Create Node
     node = struct(...
         'point', median_point, ...
         'name', name, ...
@@ -157,11 +156,8 @@ function node = build_kdtree(points, names, depth)
         'right', [] ...
     );
     
-    % 5. Recursively Build Subtrees
-    % Left: Points BEFORE the median
-    % Right: Points AFTER the median
-    
-    left_points = sorted_points(1:median_idx-1,:);
+    % Recursively Build Subtrees    
+left_points = sorted_points(1:median_idx-1,:);
 right_points = sorted_points(median_idx+1:end,:);
 
 left_names = names(1:median_idx-1);
@@ -177,11 +173,10 @@ function print_kdtree(tree, indent)
     end
     
     if ~isempty(tree)
-        % 1. Print Right side first (higher values)
-        % Using a consistent increment (e.g., 12) makes it easier to read
+        % Print Right side first (higher values)
         print_kdtree(tree.right, indent + 12);
         
-        % 2. Determine split axis label
+        % Determine split axis label
         if tree.axis == 1
             axis_name = 'Lon';
         else
@@ -189,17 +184,13 @@ function print_kdtree(tree, indent)
         end
         
         % 3. Format the label 
-        % Use %.5f for coordinates and %g or %s for Name depending on type
-        % We add a visual "connector" symbol (--)
         padding = blanks(indent);
-        %label = sprintf('%s|-- [%.5f, %.5f] (Split:%s)', ...
-                        %padding, tree.point(1), tree.point(2), axis_name);
         label = sprintf('%s|-- (Node:%s) (Split:%s)', ...
                         padding, tree.name, axis_name);
         
         fprintf('%s\n', label);
         
-        % 4. Print Left side (lower values)
+        % Print Left side (lower values)
         print_kdtree(tree.left, indent + 12);
     end
 end
@@ -208,35 +199,48 @@ tree = build_kdtree(KDnodes, names, 0);
 print_kdtree(tree);
 
 function [best_nodes, best_dists] = search_knn(KDnode, target, depth, best_nodes, best_dists, k)
+    
+    % Check for empty node to stop recursion
     if isempty(KDnode)
         return;
     end
     
+    % Convert point coordinates to numeric format if they are stored as text
     if isstring(KDnode.point) || ischar(KDnode.point)
         current_point = double(string(KDnode.point));
     else
         current_point = KDnode.point;
     end
     
+    % Calculate Euclidean distance between the target and current node
     dist = sqrt((target(1) - current_point(1))^2 + (target(2) - current_point(2))^2);
     
+    % Prevent self matching by requiring a minimum distance
     if dist > 1e-9
+        
+        % Append current node to the tracking lists
         best_dists(end+1) = dist;
         best_nodes{end+1} = KDnode;
         
+        % Sort lists to keep the closest nodes at the front
         [best_dists, sort_idx] = sort(best_dists);
         best_nodes = best_nodes(sort_idx);
         
+        % Trim the lists to maintain exactly the requested amount of neighbors
         if length(best_dists) > k
             best_dists = best_dists(1:k);
             best_nodes = best_nodes(1:k);
         end
     end
     
+    % Determine the current splitting axis based on depth
     axis_k = 2;
     axis = mod(depth, axis_k) + 1;
+    
+    % Calculate the signed distance to the splitting boundary
     axis_diff = target(axis) - current_point(axis);
     
+    % Decide which branch contains the target point to explore it first
     if axis_diff < 0
         first_branch = KDnode.left;
         second_branch = KDnode.right;
@@ -245,15 +249,20 @@ function [best_nodes, best_dists] = search_knn(KDnode, target, depth, best_nodes
         second_branch = KDnode.left;
     end
     
+    % Recursively search the primary branch
     [best_nodes, best_dists] = search_knn(first_branch, target, depth + 1, best_nodes, best_dists, k);
     
+    % Identify the furthest distance currently in our accepted list
     if length(best_dists) < k
         worst_dist = inf;
     else
         worst_dist = best_dists(end);
     end
     
+    % Check if the boundary is closer than our worst accepted point
     if abs(axis_diff) < worst_dist
+        
+        % Recursively search the opposite branch since a closer point might exist there
         [best_nodes, best_dists] = search_knn(second_branch, target, depth + 1, best_nodes, best_dists, k);
     end
 end
@@ -291,12 +300,12 @@ function currentPosition = question1(graph, startNode, endNode)
     startIndex = find(nodeNames == startNode);
     dist(startIndex) = 0;
 
-    % priority queue
+    % Priority queue
     pq_nodes = startIndex;
     pq_dist = 0;
 
     while ~isempty(pq_nodes)
-        % extract minimum distance node
+        % Extract minimum distance node
         [~, idx] = min(pq_dist);
         u = pq_nodes(idx);
 
@@ -310,9 +319,9 @@ function currentPosition = question1(graph, startNode, endNode)
 
         currentName = nodeNames(u);
 
-        % stop if end node reached
+        % Stop if end node reached
         if currentName == endNode
-            break  % break out of while loop to reconstruct path
+            break  % Break out of while loop to reconstruct path
         end
 
         nodePtr = find_node(graph, currentName);
@@ -333,7 +342,7 @@ function currentPosition = question1(graph, startNode, endNode)
         end
     end
 
-    %after finding shoprtest path, construct it
+    % After finding shoprtest path, construct it
     path = endNode;
     current = endNode;
     while current ~= startNode
@@ -449,100 +458,116 @@ end
 function prompt_question4(tree,names,lat,lon)
 
     target_name = string(input("What is the closest point to... ","s"));
-
+    
+    % Search for a  match in the names array
     target_idx = find(strcmpi(names, target_name),1);
-
+    
+    % Exit the function early if the location does not exist in the dataset
     if isempty(target_idx)
         fprintf("Location not found\n");
         return
     end
-
+    
+    % Extract the longitude and latitude for the matched location
     target_point = [lon(target_idx), lat(target_idx)];
-
+    
+    % Search the tree to find the single nearest neighbor to the target
     [closest_node, ~] = search_knn(tree, target_point, 0, cell(1,0), [], 1);
-
     node = closest_node{1};
-
+    
+    % Calculate the distance in metres
     dist = haversine_dist(lat(target_idx), lon(target_idx), node.point(2), node.point(1));
-
+    
     fprintf("Closest point to %s is %s\n", target_name, node.name);
     fprintf("Distance: %.2f metres\n", dist);
-
 end
 %% Question 5 - What is the estimated time to the closest point from A?
 function prompt_question5(tree,names,lat,lon)
 
     target_name = string(input("Estimated time to the closest point from... ","s"));
-
+    
+    % Find the corresponding index in the names array
     target_idx = find(strcmpi(names, target_name),1);
-
+    
+    % Exit early if the requested location is missing from the dataset
     if isempty(target_idx)
         fprintf("Location not found\n");
         return
     end
-
+    
+    % Extract the starting coordinates
     target_point = [lon(target_idx), lat(target_idx)];
-
+    
+    % Define average human walking speed
     walking_speed = 1.4;
-
+    
+    % Search in the spatial tree to find the single closest destination
     [closest_node, ~] = search_knn(tree, target_point, 0, cell(1,0), [], 1);
-
     node = closest_node{1};
-
+    
+    % Compute the distance in metres between the two coordinates
     dist = haversine_dist(lat(target_idx), lon(target_idx), node.point(2), node.point(1));
-
+    
+    % Calculate total travel time in seconds based on distance and speed
     time = dist / walking_speed;
-
+    
+    % Convert total seconds into minutes and seconds
     minutes = floor(time/60);
     seconds = round(rem(time,60));
-
+    
     fprintf("Closest point to %s is %s\n", target_name, node.name);
     fprintf("Estimated time: %d minutes %d seconds\n", minutes, seconds);
-
 end
-
 %% Question 6 - What are the three closest points from A?
 function prompt_question6(tree,names,lat,lon)
 
     target_name = string(input("What are the three closest points from... ","s"));
-
+    
+    % Find the corresponding index in the names array
     target_idx = find(strcmpi(names, target_name),1);
-
+    
+    % Exit early if the requested location is missing from the dataset
     if isempty(target_idx)
         fprintf("Location not found\n");
         return
     end
-
+    
+    % Extract the starting coordinates
     target_point = [lon(target_idx), lat(target_idx)];
-
+    
+    % Define average human walking speed in meters per second
     walking_speed = 1.4;
-
+    
+    % Searching the spatial tree to find 3 closest points
     [closest_nodes, ~] = search_knn(tree, target_point, 0, cell(1,0), [], 3);
-
+    
     fprintf("Three closest points to %s:\n", target_name);
-
+    
+    % Loop through each of the found nearby locations
     for i = 1:length(closest_nodes)
-
+        
+        % Extract the current location node from the results list
         node = closest_nodes{i};
-
+        
+        % Compute the distance between the two coordinates in metres
         dist = haversine_dist(lat(target_idx), lon(target_idx), node.point(2), node.point(1));
-
+        
+        % Calculate total travel time and convert it into minutes and seconds
         time = dist / walking_speed;
-
         minutes = floor(time/60);
         seconds = round(rem(time,60));
-
+        
         fprintf("%d) %s - %.2f metres (%d min %d sec)\n", i, node.name, dist, minutes, seconds);
-
     end
-
 end
 %% Question 7 - How do I get back to the nearest waiting point? (P4 & P7)
 function currentPosition = question7(graph, startNode)
+    % Use question 2 to find distance from P4 and P7
     distance_from_p4 = question2(graph, startNode, "P4");
     distance_from_p7 = question2(graph, startNode, "P7");
     fprintf("Distance to P4 (Waiting point 1): %.2fm\n", distance_from_p4);
     fprintf("Distance to P7 (Waiting point 2): %.2fm\n", distance_from_p7);
+    % Change the current position depending on which is closer
     if (distance_from_p4 > distance_from_p7)
         fprintf("P7 is closer. Here is how to get to waiting point 2:");
         question1(graph, startNode, "P7");
@@ -550,10 +575,11 @@ function currentPosition = question7(graph, startNode)
     else
         fprintf("P4 is closer. Here is how to get to waiting point 1: ");
         question1(graph, startNode, "P4");
-        currentPosition = "P7";
+        currentPosition = "P4";
     end
 end
 
+% Prompts the question 7 function
 function currentPosition = prompt_question7(graph, currentPosition)
     fprintf("How do I get back to the nearest point? \n");
     fprintf("You are currently at %s\n", currentPosition);
@@ -565,17 +591,19 @@ function currentPosition = prompt_question8(graph, currentPosition)
     rng("shuffle");
     fprintf("Take me anywhere! \n");
     fprintf("You are currently at %s\n", currentPosition);
+    % Random generate a number for the point to travel to
     random_choice = randi([1 7]);
     disp(random_choice);
     places = ["Marshgate", "One Pool Street", "Itsu", "Waitrose", "McDonald's", "Caffe Nero", "Greggs", "P1", "P2", "P3", "P4", "P5", "P6", "P7","P8", "P9", "P10"];
     random_place = places(random_choice);
     disp(random_place)
-    while random_place == currentPosition %makes sure it doesnt choose same place
+    while random_place == currentPosition % Makes sure it doesnt choose same place
         rng("shuffle");
         random_choice = randi([1 7]);
         random_place = places(random_choice);
     end
     fprintf("Let's go to %s", random_place);
+    % Prompt question 1 for how to travel to the random place
     question1(graph, currentPosition, random_place);
     currentPosition = random_place;
 end
@@ -583,6 +611,7 @@ end
 %% Question 9 - I would like to know more about A
 function prompt_question9()
     target_name = string(input("I would like to know more about..", "s"));
+    % Display information about the selected location
     switch target_name
         case "Marshgate"
             disp('--- UCL Marshgate Summary ---');
@@ -645,6 +674,7 @@ function question10(graph, startNode, pointA, pointB)
     distance_from_B = question2(graph, startNode, pointB);
     fprintf("Distance to %s: %.2fm\n", pointA, distance_from_A);
     fprintf("Distance to %s: %.2fm\n", pointB, distance_from_B);
+    % Checks which point is closer to the current start node
     if (distance_from_A > distance_from_B)
        fprintf("%s is closer.", pointA);
        question2(graph, startNode, pointA);
@@ -685,7 +715,7 @@ function display_map(data, lat, lon, type, names)
     geobasemap streets
     title('Location Map')
     legend('Main Points','Passing Points')
-    %correspond points to data
+    % Correspond points to data
     marshgate = [data(1,1), data(1,2)];
     ops = [data(2,1), data(2,2)];
     itsu = [data(3,1), data(3,2)];
@@ -733,7 +763,7 @@ hold on
     lat2 = point2(1);
     lon2 = point2(2);
     arclen = distance(lat1,lon1,lat2,lon2);
-    dist = deg2km(arclen)*1000; %distance in metres
+    dist = deg2km(arclen)*1000; % Distance in metres
     midLat = (lat1+lat2)/2;
     midLon = (lon1+lon2)/2;
     
@@ -743,7 +773,7 @@ end
 
 %% main
 disconnect = false;
-currentPosition = "Marshgate"; %starts at Marshgate
+currentPosition = "Marshgate"; % Starts at Marshgate
 while ~disconnect
     question = input("Hi! I'm your very trustworthy navigation robot. What would you like to ask me?\n1) (Traverse) How do I get from ... to ...?\n2) (Info) What is the shortest distance from ... to ...?\n3) (Info) What is the estimated time from ... to ...?\n4) (Info) What is the closest point to A?\n5) (Info) What is the estimated time to the closest point to A?\n6) (Info) What are the three closest points to A?\n7) (Traverse) How do I get back to the nearest waiting point?\n8) (Traverse) Take me anywhere!\n9) (Info)Tell me more about A\n10) (Info) Is A or B closer to me?\n11) [BONUS] Show me a map!\nChoose a question: ");
     switch question

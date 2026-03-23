@@ -1,12 +1,8 @@
-% =========================================================
-% MAIN SCRIPT: RUN AND VISUALIZE QUADTREE
-% =========================================================
 clc; close all;
 
-% --- VISUALIZATION MODIFICATION SECTION ---
-% 1a. Split data based on names
-is_p_point = startsWith(names, 'P'); % Logical array (1 for P-points, 0 for places)
-is_place = ~is_p_point;           % Logical array (0 for P-points, 1 for places)
+% 1. Split data based on names
+is_p_point = startsWith(names, 'P');
+is_place = ~is_p_point;   
 
 % Combine into a cell array for the tree structure: [Longitude, Latitude, Name]
 my_points_data = [num2cell(lon), num2cell(lat), cellstr(names)];
@@ -22,7 +18,7 @@ figure('Name', 'Geographic Quadtree', 'Color', 'w');
 hold on;
 axis equal;
 
-% Set map boundaries tightly around the GPS data (with small padding)
+% Set map boundaries tightly around the GPS data
 xlim([min(lon) - 0.002, max(lon) + 0.004]);
 ylim([min(lat) - 0.002, max(lat) + 0.002]);
 
@@ -30,19 +26,13 @@ title('Quadtree');
 xlabel('Longitude (X)'); 
 ylabel('Latitude (Y)');
 
-% Draw the tree rectangles (Blue Grid)
+% Draw the tree rectangles
 visualize_quadtree(tree);
 
-% --- FIX APPLYING DIFFERENT COLORS ---
-% 3a. Plot Named Places (Green Stars)
 plot(lon(is_place), lat(is_place), 'gp', 'MarkerSize', 10, 'MarkerFaceColor', 'g');
-
-% 3b. Plot P-points (Red Dots)
 plot(lon(is_p_point), lat(is_p_point), 'r.', 'MarkerSize', 15);
 
-% --- TEXT LABELS (With updated coloring for clarity) ---
 for i = 1:num_locations
-    % Define specific offsets and colors for labels based on type
     if is_place(i)
         offset_x = 0.0002; offset_y = 0.0001; text_color = [0 0.5 0]; % Greenish text
         f_size = 9; f_weight = 'bold';
@@ -58,11 +48,7 @@ end
 hold off;
 disp('Visualization complete.');
 
-
-% =========================================================
-% QUADTREE FUNCTIONS (Local functions)
-% =========================================================
-
+% QUADTREE FUNCTIONS
 function tree_root = build_quadtree(points, capacity)
     % Extract coordinates to find the map boundaries
     if iscell(points)
@@ -73,7 +59,7 @@ function tree_root = build_quadtree(points, capacity)
         coords = double(points(:, 1:2));
     end
     
-    % Define the World Boundary [xmin, xmax, ymin, ymax] with a tiny buffer
+    % Define the World Boundary [xmin, xmax, ymin, ymax]
     xmin = min(coords(:,1)) - 0.001;
     xmax = max(coords(:,1)) + 0.001;
     ymin = min(coords(:,2)) - 0.001;
@@ -113,7 +99,7 @@ function node = insert_quadpoint(node, point_row, capacity)
         return;
     end
     
-    % 3. Leaf Node: Store the ENTIRE row (including the name)
+    % 3. Leaf Node: Store the entire row
     if isempty(node.points)
         node.points = point_row;
     else
@@ -161,7 +147,7 @@ function visualize_quadtree(node)
         return;
     end
     
-    % Draw the boundary rectangle [x, y, width, height]
+    % Draw the boundary rectangle
     b = node.boundary;
     width = b(2) - b(1);
     height = b(4) - b(3);
