@@ -1,4 +1,4 @@
-%% Initialise adjecency list and graph
+%%Initialise adjecency list and graph
 function newNode = createNode(nodeName)
     newNode = struct("Name", nodeName, "Connections", [], "Next", []);
 end
@@ -51,7 +51,7 @@ nodes = ["Marshgate", ...
          "Itsu", ...
          "Waitrose", ...
          "McDonald's", ...
-         "Caffe Nero", ...
+         "Cafe Nero", ...
          "Greggs", ...
          "P1", ...
          "P2", ...
@@ -63,27 +63,27 @@ nodes = ["Marshgate", ...
          "P8", ...
          "P9", ...
          "P10"];   
-Connections = ["Marshgate", "P1", 46.5793, ...
-               "P1", "One Pool Street", 108.9746, ...
-               "One Pool Street", "P2", 259.3725, ...
-               "One Pool Street", "P3",  286.4613, ...
-               "One Pool Street", "P4", 117.5754, ...
-               "Itsu", "P2", 235.0486, ...
-               "Itsu", "P3", 150.2012, ...
-               "Itsu", "P5", 61.0882, ...
-               "P4", "P6", 283.2375, ...
-               "P5", "P6", 198.6381, ...
-               "P5", "P7", 104.8713, ...
-               "P9", "P6", 261.3461, ...
+Connections = ["Marshgate", "P1", 44.5263, ...
+               "P1", "One Pool Street", 136.3424, ...
+               "One Pool Street", "P2", 258.7496, ...
+               "One Pool Street", "P3",  245.5895, ...
+               "One Pool Street", "P4", 83.9197, ...
+               "Itsu", "P2", 235.0482, ...
+               "Itsu", "P3", 165.8697, ...
+               "Itsu", "P5", 38.2499, ...
+               "P4", "P6", 294.1837, ...
+               "P5", "P6", 191.6893, ...
+               "P5", "P7", 105.9421, ...
+               "P9", "P6", 248.5135, ...
                "P7", "Waitrose", 147.8088, ...
-               "P8", "Waitrose", 137.6163, ...
-               "P8", "McDonald's", 60.2680, ...
+               "P8", "Waitrose", 144.9587, ...
+               "P8", "McDonald's", 59.3594, ...
                "P7", "McDonald's", 149.1913, ...
-               "P10", "McDonald's", 51.1129, ...
-               "P7", "Caffe Nero", 159.7494, ...
-               "P9", "Caffe Nero", 64.5876, ...
-               "P9", "Greggs", 70.2101, ...
-               "P10", "Greggs", 38.2493];
+               "P10", "McDonald's", 52.7022, ...
+               "P7", "Cafe Nero", 147.0308, ...
+               "P9", "Cafe Nero", 57.1090, ...
+               "P9", "Greggs", 38.2287, ...
+               "P10", "Greggs", 46.5749];
 graph = [];
 
 for i = 1:numel(nodes)
@@ -99,31 +99,32 @@ for i = 1:3:numel(Connections)
     graph = add_connection(graph, toNode, fromNode, weight);
 end
 data = [
-51.5378 -0.01152 1
-51.5385 -0.01022 1
-51.5418 -0.00947 1
-51.5438 -0.00876 1
-51.5436 -0.00596 1
-51.5427 -0.00525 1
-51.5431 -0.00495 1
-51.5382 -0.01172 0
-51.5405 -0.01215 0
-51.5410 -0.01122 0
-51.5385 -0.00852 0
-51.5421 -0.00873 0
-51.5408 -0.00676 0
-51.5427 -0.00756 0
-51.5438 -0.00677 0
-51.5426 -0.00433 0
-51.5433 -0.00540 0
+51.53780  -0.01155  1
+51.53870  -0.00972  1
+51.54190  -0.00920  1
+51.54380  -0.00876  1
+51.54360  -0.00596  1
+51.54280  -0.00544  1
+51.54300  -0.00490  1
+51.53820  -0.01152  0
+51.54060  -0.01188  0
+51.54080  -0.01082  0
+51.53850  -0.00855  0
+51.54210  -0.00875  0
+51.54090  -0.00676  0
+51.54270  -0.00756  0
+51.54390  -0.00667  0
+51.54270  -0.00463  0
+51.54330  -0.00537  0
 ];
-%% Initialise KD Tree
+%%Initialise KD Tree
 lat = data(:,1);
 lon = data(:,2);
 type = data(:,3);
 
-names = ["Marshgate";"One Pool Street";"Itsu";"Waitrose";"McDonald's";"Caffe Nero";"Greggs";"P1";"P2";"P3";"P4";"P5";"P6";"P7";"P8";"P9";"P10"];
+names = ["Marshgate";"One Pool Street";"Itsu";"Waitrose";"McDonald's";"Cafe Nero";"Greggs";"P1";"P2";"P3";"P4";"P5";"P6";"P7";"P8";"P9";"P10"];
 
+%%Initialise KD Tree
 function node = build_kdtree(points, names, depth)
     % Base Case: No points left to process
     if isempty(points)
@@ -131,23 +132,24 @@ function node = build_kdtree(points, names, depth)
         return;
     end
 
-    % Determine Axis based on depth
-    % Depth 0 -> Axis 1 (Lon)
-    % Depth 1 -> Axis 2 (Lat)
-    % Depth 2 -> Axis 1 (Lon) ...
+    % 1. Determine Axis based on depth
+    % Depth 0 -> Axis 1 (X)
+    % Depth 1 -> Axis 2 (Y)
+    % Depth 2 -> Axis 1 (X) ...
     k = 2; % Dimensions (2D)
     axis = mod(depth, k) + 1;
     
-    % Sort points by the current axis
+    % 2. Sort points by the current axis
+    % sortrows(points, axis) sorts the matrix based on the column 'axis'
     sorted_points = sortrows(points, axis);
     
-    % Find Median
+    % 3. Find Median
     n = size(sorted_points, 1);
-    median_idx = floor(n / 2) + 1;
+    median_idx = floor(n / 2) + 1; % Selects middle element
     median_point = [sorted_points(median_idx, 1), sorted_points(median_idx, 2)];
     name = names(median_idx);
     
-    % Create Node
+    % 4. Create Node
     node = struct(...
         'point', median_point, ...
         'name', name, ...
@@ -156,8 +158,11 @@ function node = build_kdtree(points, names, depth)
         'right', [] ...
     );
     
-    % Recursively Build Subtrees    
-left_points = sorted_points(1:median_idx-1,:);
+    % 5. Recursively Build Subtrees
+    % Left: Points BEFORE the median
+    % Right: Points AFTER the median
+    
+    left_points = sorted_points(1:median_idx-1,:);
 right_points = sorted_points(median_idx+1:end,:);
 
 left_names = names(1:median_idx-1);
@@ -166,17 +171,17 @@ right_names = names(median_idx+1:end);
 node.left = build_kdtree(left_points, left_names, depth + 1);
 node.right = build_kdtree(right_points, right_names, depth + 1);
 end
-
 function print_kdtree(tree, indent)
     if nargin < 2
         indent = 0;
     end
     
     if ~isempty(tree)
-        % Print Right side first (higher values)
+        % 1. Print Right side first (higher values)
+        % Using a consistent increment (e.g., 12) makes it easier to read
         print_kdtree(tree.right, indent + 12);
         
-        % Determine split axis label
+        % 2. Determine split axis label
         if tree.axis == 1
             axis_name = 'Lon';
         else
@@ -184,13 +189,17 @@ function print_kdtree(tree, indent)
         end
         
         % 3. Format the label 
+        % Use %.5f for coordinates and %g or %s for Name depending on type
+        % We add a visual "connector" symbol (--)
         padding = blanks(indent);
+        %label = sprintf('%s|-- [%.5f, %.5f] (Split:%s)', ...
+                        %padding, tree.point(1), tree.point(2), axis_name);
         label = sprintf('%s|-- (Node:%s) (Split:%s)', ...
                         padding, tree.name, axis_name);
         
         fprintf('%s\n', label);
         
-        % Print Left side (lower values)
+        % 4. Print Left side (lower values)
         print_kdtree(tree.left, indent + 12);
     end
 end
@@ -199,48 +208,35 @@ tree = build_kdtree(KDnodes, names, 0);
 print_kdtree(tree);
 
 function [best_nodes, best_dists] = search_knn(KDnode, target, depth, best_nodes, best_dists, k)
-    
-    % Check for empty node to stop recursion
     if isempty(KDnode)
         return;
     end
     
-    % Convert point coordinates to numeric format if they are stored as text
     if isstring(KDnode.point) || ischar(KDnode.point)
         current_point = double(string(KDnode.point));
     else
         current_point = KDnode.point;
     end
     
-    % Calculate Euclidean distance between the target and current node
     dist = sqrt((target(1) - current_point(1))^2 + (target(2) - current_point(2))^2);
     
-    % Prevent self matching by requiring a minimum distance
     if dist > 1e-9
-        
-        % Append current node to the tracking lists
         best_dists(end+1) = dist;
         best_nodes{end+1} = KDnode;
         
-        % Sort lists to keep the closest nodes at the front
         [best_dists, sort_idx] = sort(best_dists);
         best_nodes = best_nodes(sort_idx);
         
-        % Trim the lists to maintain exactly the requested amount of neighbors
         if length(best_dists) > k
             best_dists = best_dists(1:k);
             best_nodes = best_nodes(1:k);
         end
     end
     
-    % Determine the current splitting axis based on depth
     axis_k = 2;
     axis = mod(depth, axis_k) + 1;
-    
-    % Calculate the signed distance to the splitting boundary
     axis_diff = target(axis) - current_point(axis);
     
-    % Decide which branch contains the target point to explore it first
     if axis_diff < 0
         first_branch = KDnode.left;
         second_branch = KDnode.right;
@@ -249,20 +245,15 @@ function [best_nodes, best_dists] = search_knn(KDnode, target, depth, best_nodes
         second_branch = KDnode.left;
     end
     
-    % Recursively search the primary branch
     [best_nodes, best_dists] = search_knn(first_branch, target, depth + 1, best_nodes, best_dists, k);
     
-    % Identify the furthest distance currently in our accepted list
     if length(best_dists) < k
         worst_dist = inf;
     else
         worst_dist = best_dists(end);
     end
     
-    % Check if the boundary is closer than our worst accepted point
     if abs(axis_diff) < worst_dist
-        
-        % Recursively search the opposite branch since a closer point might exist there
         [best_nodes, best_dists] = search_knn(second_branch, target, depth + 1, best_nodes, best_dists, k);
     end
 end
@@ -279,7 +270,7 @@ function d = haversine_dist(lat1, lon1, lat2, lon2)
     c = 2 * atan2(sqrt(a), sqrt(1-a));
     d = R * c; % Distance in meters
 end
-%% QUESTION 1 - How do I get from A to B?
+%%QUESTION 1 - How do I get from A to B?
 
 function currentPosition = question1(graph, startNode, endNode)
     fprintf("\nStart from %s\n", startNode);
@@ -300,12 +291,12 @@ function currentPosition = question1(graph, startNode, endNode)
     startIndex = find(nodeNames == startNode);
     dist(startIndex) = 0;
 
-    % Priority queue
+    % priority queue
     pq_nodes = startIndex;
     pq_dist = 0;
 
     while ~isempty(pq_nodes)
-        % Extract minimum distance node
+        % extract minimum distance node
         [~, idx] = min(pq_dist);
         u = pq_nodes(idx);
 
@@ -319,9 +310,9 @@ function currentPosition = question1(graph, startNode, endNode)
 
         currentName = nodeNames(u);
 
-        % Stop if end node reached
+        % stop if end node reached
         if currentName == endNode
-            break  % Break out of while loop to reconstruct path
+            break  % break out of while loop to reconstruct path
         end
 
         nodePtr = find_node(graph, currentName);
@@ -342,7 +333,7 @@ function currentPosition = question1(graph, startNode, endNode)
         end
     end
 
-    % After finding shoprtest path, construct it
+    %after finding shortest path, construct it
     path = endNode;
     current = endNode;
     while current ~= startNode
@@ -364,8 +355,6 @@ function currentPosition = question1(graph, startNode, endNode)
     end
     fprintf("reached %s", endNode);
     currentPosition = endNode;
-
-    move_path(path);
 end
 function currentPosition = prompt_question1(graph)
     startNode = string(input("How do I get from... ","s"));
@@ -375,8 +364,8 @@ function currentPosition = prompt_question1(graph)
     currentPosition = endNode;
 end
 
-%% Question 2 - What is the shortest distance from A to B?
-function distance = question2(graph, startNode, endNode);
+%%Question 2 - What is the shortest distance from A to B?
+function distance = question2(graph, startNode, endNode)
     % collect node names
     nodeNames = strings(0);
     ptr = graph;
@@ -442,7 +431,7 @@ function prompt_question2(graph)
     fprintf("Shortest distance from %s to %s is %.2f metres", startNode, endNode, shortest_distance);
 end
 
-%% Question 3 - What is the estimated time from A to B?
+%%Question 3 - What is the estimated time from A to B?
 function prompt_question3(graph)
     startNode = string(input("What is the estimated time from... ","s"));
     endNode = string(input("to... ","s"));
@@ -454,227 +443,208 @@ function prompt_question3(graph)
     fprintf("Estimated time from %s to %s is %.0f minutes %.0f seconds", startNode, endNode, shortest_time_mins, shortest_time_seconds);
 end
 
-%% Question 4 - What is the closest point to A?
+%%Question 4 - What is the closest point to A?
 function prompt_question4(tree,names,lat,lon)
 
     target_name = string(input("What is the closest point to... ","s"));
-    
-    % Search for a  match in the names array
+
     target_idx = find(strcmpi(names, target_name),1);
-    
-    % Exit the function early if the location does not exist in the dataset
+
     if isempty(target_idx)
         fprintf("Location not found\n");
         return
     end
-    
-    % Extract the longitude and latitude for the matched location
+
     target_point = [lon(target_idx), lat(target_idx)];
-    
-    % Search the tree to find the single nearest neighbor to the target
+
     [closest_node, ~] = search_knn(tree, target_point, 0, cell(1,0), [], 1);
+
     node = closest_node{1};
-    
-    % Calculate the distance in metres
+
     dist = haversine_dist(lat(target_idx), lon(target_idx), node.point(2), node.point(1));
-    
+
     fprintf("Closest point to %s is %s\n", target_name, node.name);
     fprintf("Distance: %.2f metres\n", dist);
+
 end
-%% Question 5 - What is the estimated time to the closest point from A?
+%%Question 5 - What is the estimated time to the closest point from A?
 function prompt_question5(tree,names,lat,lon)
 
     target_name = string(input("Estimated time to the closest point from... ","s"));
-    
-    % Find the corresponding index in the names array
+
     target_idx = find(strcmpi(names, target_name),1);
-    
-    % Exit early if the requested location is missing from the dataset
+
     if isempty(target_idx)
         fprintf("Location not found\n");
         return
     end
-    
-    % Extract the starting coordinates
+
     target_point = [lon(target_idx), lat(target_idx)];
-    
-    % Define average human walking speed
+
     walking_speed = 1.4;
-    
-    % Search in the spatial tree to find the single closest destination
+
     [closest_node, ~] = search_knn(tree, target_point, 0, cell(1,0), [], 1);
+
     node = closest_node{1};
-    
-    % Compute the distance in metres between the two coordinates
+
     dist = haversine_dist(lat(target_idx), lon(target_idx), node.point(2), node.point(1));
-    
-    % Calculate total travel time in seconds based on distance and speed
+
     time = dist / walking_speed;
-    
-    % Convert total seconds into minutes and seconds
+
     minutes = floor(time/60);
     seconds = round(rem(time,60));
-    
+
     fprintf("Closest point to %s is %s\n", target_name, node.name);
     fprintf("Estimated time: %d minutes %d seconds\n", minutes, seconds);
-end
-%% Question 6 - What are the three closest points from A?
-function prompt_question6(tree,names,lat,lon)
 
-    target_name = string(input("What are the three closest points from... ","s"));
-    
-    % Find the corresponding index in the names array
+end
+
+%%Question 6 - What are the three closest points from A?
+function closest_nodes = question6(tree,names,lat,lon, target_name)
+    closest_nodes = {};
     target_idx = find(strcmpi(names, target_name),1);
-    
-    % Exit early if the requested location is missing from the dataset
+
     if isempty(target_idx)
         fprintf("Location not found\n");
         return
     end
-    
-    % Extract the starting coordinates
+
     target_point = [lon(target_idx), lat(target_idx)];
-    
-    % Define average human walking speed in meters per second
+
     walking_speed = 1.4;
-    
-    % Searching the spatial tree to find 3 closest points
+
     [closest_nodes, ~] = search_knn(tree, target_point, 0, cell(1,0), [], 3);
     
     fprintf("Three closest points to %s:\n", target_name);
-    
-    % Loop through each of the found nearby locations
+
     for i = 1:length(closest_nodes)
-        
-        % Extract the current location node from the results list
+
         node = closest_nodes{i};
-        
-        % Compute the distance between the two coordinates in metres
+
         dist = haversine_dist(lat(target_idx), lon(target_idx), node.point(2), node.point(1));
-        
-        % Calculate total travel time and convert it into minutes and seconds
+
         time = dist / walking_speed;
+
         minutes = floor(time/60);
         seconds = round(rem(time,60));
-        
+
         fprintf("%d) %s - %.2f metres (%d min %d sec)\n", i, node.name, dist, minutes, seconds);
     end
+    return
 end
-%% Question 7 - How do I get back to the nearest waiting point? (P4 & P7)
+function prompt_question6(tree,names,lat,lon)
+    target_name = string(input("What are the three closest points from... ","s"));
+    question6(tree, names, lat, lon, target_name);
+end
+
+%%Question 7 - How do I get back to the nearest waiting point? (P4 & P7)
 function currentPosition = question7(graph, startNode)
-    % Use question 2 to find distance from P4 and P7
     distance_from_p4 = question2(graph, startNode, "P4");
     distance_from_p7 = question2(graph, startNode, "P7");
     fprintf("Distance to P4 (Waiting point 1): %.2fm\n", distance_from_p4);
     fprintf("Distance to P7 (Waiting point 2): %.2fm\n", distance_from_p7);
-    % Change the current position depending on which is closer
     if (distance_from_p4 > distance_from_p7)
-        fprintf("P7 is closer. Here is how to get to waiting point 2:");
-        question1(graph, startNode, "P7");
-        currentPosition = "P7";
+       fprintf("P7 is closer. Here is how to get to waiting point 2:");
+       question1(graph, startNode, "P7");
+       currentPosition = "P7";
     else
         fprintf("P4 is closer. Here is how to get to waiting point 1: ");
-        question1(graph, startNode, "P4");
-        currentPosition = "P4";
+       question1(graph, startNode, "P4");
+       currentPosition = "P7";
     end
 end
-
-% Prompts the question 7 function
 function currentPosition = prompt_question7(graph, currentPosition)
     fprintf("How do I get back to the nearest point? \n");
     fprintf("You are currently at %s\n", currentPosition);
     currentPosition = question7(graph, currentPosition);
 end
-
-%% Question 8 - Take me anywhere!
+%%Question 8 - Take me anywhere!
 function currentPosition = prompt_question8(graph, currentPosition)
     rng("shuffle");
     fprintf("Take me anywhere! \n");
     fprintf("You are currently at %s\n", currentPosition);
-    % Random generate a number for the point to travel to
     random_choice = randi([1 7]);
     disp(random_choice);
-    places = ["Marshgate", "One Pool Street", "Itsu", "Waitrose", "McDonald's", "Caffe Nero", "Greggs", "P1", "P2", "P3", "P4", "P5", "P6", "P7","P8", "P9", "P10"];
+    places = ["Marshgate", "One Pool Street", "Itsu", "Waitrose", "McDonald's", "Cafe Nero", "Greggs", "P1", "P2", "P3", "P4", "P5", "P6", "P7","P8", "P9", "P10"];
     random_place = places(random_choice);
-    disp(random_place)
-    while random_place == currentPosition % Makes sure it doesnt choose same place
+    while random_place == currentPosition %makes sure it doesnt choose same place
         rng("shuffle");
         random_choice = randi([1 7]);
         random_place = places(random_choice);
     end
     fprintf("Let's go to %s", random_place);
-    % Prompt question 1 for how to travel to the random place
-    question1(graph, currentPosition, random_place);
+    currentPosition = question1(graph, currentPosition, random_place);
     currentPosition = random_place;
 end
 
-%% Question 9 - I would like to know more about A
+%%Question 9 - I would like to know more about A
+function question9(target_name)
+switch target_name
+    case "Marshgate"
+        disp('--- UCL Marshgate Summary ---');
+        disp('- Flagship Building: The massive centerpiece of the new UCL East campus in Stratford, London, opened in 2023.');
+        disp('- Collaborative Vibe: Mixes engineering, robotics, architecture, and creative arts in one space to encourage teamwork.');
+        disp('- Design & Tech: Features a huge open atrium, high-tech fabrication labs, and top-tier sustainability ratings.');
+        disp('- Publicly Accessible: The lower floors are open to the community, featuring a cafe, library, and exhibition spaces.');
+        disp('-----------------------------');
+        
+    case "One Pool Street"
+        disp('--- One Pool Street Summary ---');
+        disp('- UCL East Hub: The first building to open on the new UCL East campus (2022).');
+        disp('- Mixed Use: Combines cutting-edge academic labs, a cinema, and student accommodation on the upper floors.');
+        disp('- Key Facilities: Houses the Robotics and Autonomous Systems lab and global ecology spaces.');
+        disp('- Community Focus: Features public cafes, art installations, and open collaborative areas.');
+        disp('-------------------------------');
+        
+    case "Itsu"
+        disp('--- Itsu Summary ---');
+        disp('- Cuisine: Asian-inspired fast food focusing on sushi, salads, and hot noodle/rice bowls.');
+        disp('- Vibe: Quick, healthy, and modern. Great for a light lunch between lectures.');
+        disp('- Perks: Famous among students for their half-price evening sale to reduce food waste.');
+        disp('--------------------');
+        
+    case "Waitrose"
+        disp('--- Waitrose Summary ---');
+        disp('- Type: Premium British supermarket located in nearby Westfield Stratford.');
+        disp('- Offerings: High-quality groceries, fresh bakery, and a popular lunchtime meal deal.');
+        disp('- Vibe: A bit more upmarket, perfect for grabbing fresh ingredients or a nice study snack.');
+        disp('------------------------');
+        
+    case "McDonalds"
+        disp('--- McDonalds Summary ---');
+        disp('- Type: Classic, globally recognized fast-food chain.');
+        disp('- Offerings: Burgers, fries, chicken nuggets, and cheap coffee.');
+        disp('- Vibe: Fast, affordable, and incredibly convenient for a quick bite or late-night fuel.');
+        disp('-------------------------');
+        
+    case "Cafe Nero"
+        disp('--- Cafe Nero Summary ---');
+        disp('- Type: Popular European-style coffee house chain.');
+        disp('- Offerings: Premium espresso drinks, hot paninis, and sweet pastries.');
+        disp('- Vibe: Cozy and relaxed. A great off-campus spot for a caffeine fix or pulling out a laptop to study.');
+        disp('--------------------------');
+        
+    case "Greggs"
+        disp('--- Greggs Summary ---');
+        disp('- Type: Iconic, budget-friendly British bakery chain.');
+        disp('- Offerings: Famous for sausage rolls, steak bakes, sandwiches, and sweet treats.');
+        disp('- Vibe: Casual, cheap, and cheerful. An absolute staple for student life in the UK.');
+        disp('----------------------');
+    
+    otherwise
+        disp("Location unavailable")
+end
+end
 function prompt_question9()
     target_name = string(input("I would like to know more about..", "s"));
-    % Display information about the selected location
-    switch target_name
-        case "Marshgate"
-            disp('--- UCL Marshgate Summary ---');
-            disp('- Flagship Building: The massive centerpiece of the new UCL East campus in Stratford, London, opened in 2023.');
-            disp('- Collaborative Vibe: Mixes engineering, robotics, architecture, and creative arts in one space to encourage teamwork.');
-            disp('- Design & Tech: Features a huge open atrium, high-tech fabrication labs, and top-tier sustainability ratings.');
-            disp('- Publicly Accessible: The lower floors are open to the community, featuring a cafe, library, and exhibition spaces.');
-            disp('-----------------------------');
-            
-        case "One Pool Street"
-            disp('--- One Pool Street Summary ---');
-            disp('- UCL East Hub: The first building to open on the new UCL East campus (2022).');
-            disp('- Mixed Use: Combines cutting-edge academic labs, a cinema, and student accommodation on the upper floors.');
-            disp('- Key Facilities: Houses the Robotics and Autonomous Systems lab and global ecology spaces.');
-            disp('- Community Focus: Features public cafes, art installations, and open collaborative areas.');
-            disp('-------------------------------');
-            
-        case "Itsu"
-            disp('--- Itsu Summary ---');
-            disp('- Cuisine: Asian-inspired fast food focusing on sushi, salads, and hot noodle/rice bowls.');
-            disp('- Vibe: Quick, healthy, and modern. Great for a light lunch between lectures.');
-            disp('- Perks: Famous among students for their half-price evening sale to reduce food waste.');
-            disp('--------------------');
-            
-        case "Waitrose"
-            disp('--- Waitrose Summary ---');
-            disp('- Type: Premium British supermarket located in nearby Westfield Stratford.');
-            disp('- Offerings: High-quality groceries, fresh bakery, and a popular lunchtime meal deal.');
-            disp('- Vibe: A bit more upmarket, perfect for grabbing fresh ingredients or a nice study snack.');
-            disp('------------------------');
-            
-        case "McDonalds"
-            disp('--- McDonalds Summary ---');
-            disp('- Type: Classic, globally recognized fast-food chain.');
-            disp('- Offerings: Burgers, fries, chicken nuggets, and cheap coffee.');
-            disp('- Vibe: Fast, affordable, and incredibly convenient for a quick bite or late-night fuel.');
-            disp('-------------------------');
-            
-        case "Caffe Nero"
-            disp('--- Caffe Nero Summary ---');
-            disp('- Type: Popular European-style coffee house chain.');
-            disp('- Offerings: Premium espresso drinks, hot paninis, and sweet pastries.');
-            disp('- Vibe: Cozy and relaxed. A great off-campus spot for a caffeine fix or pulling out a laptop to study.');
-            disp('--------------------------');
-            
-        case "Greggs"
-            disp('--- Greggs Summary ---');
-            disp('- Type: Iconic, budget-friendly British bakery chain.');
-            disp('- Offerings: Famous for sausage rolls, steak bakes, sandwiches, and sweet treats.');
-            disp('- Vibe: Casual, cheap, and cheerful. An absolute staple for student life in the UK.');
-            disp('----------------------');
-        
-        otherwise
-            disp("Location unavailable")
-    end
+    question9(target_name);
 end
-%% Question 10 - Is A or B closer to me?
+%%Question 10 - Is A or B closer to me?
 function question10(graph, startNode, pointA, pointB)
     distance_from_A = question2(graph, startNode, pointA);
     distance_from_B = question2(graph, startNode, pointB);
     fprintf("Distance to %s: %.2fm\n", pointA, distance_from_A);
     fprintf("Distance to %s: %.2fm\n", pointB, distance_from_B);
-    % Checks which point is closer to the current start node
     if (distance_from_A > distance_from_B)
        fprintf("%s is closer.", pointA);
        question2(graph, startNode, pointA);
@@ -683,7 +653,6 @@ function question10(graph, startNode, pointA, pointB)
        question2(graph, startNode, pointB);
     end
 end
-
 function prompt_question10(graph, currentPosition)
     pointA = string(input("Is...","s"));
     pointB = string(input("or... ","s"));
@@ -692,48 +661,48 @@ function prompt_question10(graph, currentPosition)
     fprintf("You are currently at %s\n", currentPosition);
     question10(graph, currentPosition, pointA, pointB);
 end
-
-%% BONUS - SHOW ME A MAP
+%%BONUS- SHOW ME A MAP
 function display_map(data, lat, lon, type, names)
-    lat1 = lat(type==1);
-    lon1 = lon(type==1);
-    
-    lat0 = lat(type==0);
-    lon0 = lon(type==0);
-    
-    % Create geographic plot
-    figure
-    geoscatter(lat1,lon1,80,'red','filled')
-    hold on
-    geoscatter(lat0,lon0,80,'blue','filled')
-    
-    % Add labels
-    for i = 1:length(names)
-        text(lat(i),lon(i),names{i},'FontSize',8)
-    end
-    % Map style
-    geobasemap streets
-    title('Location Map')
-    legend('Main Points','Passing Points')
-    % Correspond points to data
-    marshgate = [data(1,1), data(1,2)];
-    ops = [data(2,1), data(2,2)];
-    itsu = [data(3,1), data(3,2)];
-    waitrose = [data(4,1), data(4,2)];
-    mcdonalds = [data(5,1), data(5,2)];
-    nero = [data(6,1), data(6,2)];
-    greggs = [data(7,1), data(7,2)];
-    p1 = [data(8,1), data(8,2)];
-    p2 = [data(9,1), data(9,2)];
-    p3 = [data(10,1), data(10,2)];
-    p4 = [data(11,1), data(11,2)];
-    p5 = [data(12,1), data(12,2)];
-    p6 = [data(13,1), data(13,2)];
-    p7 = [data(14,1), data(14,2)];
-    p8 = [data(15,1), data(15,2)];
-    p9 = [data(16,1), data(16,2)];
-    p10 = [data(17,1), data(17,2)];
-    plot_distance(marshgate, p1);
+lat1 = lat(type==1);
+lon1 = lon(type==1);
+
+lat0 = lat(type==0);
+lon0 = lon(type==0);
+
+% Create geographic plot
+figure
+geoscatter(lat1,lon1,80,'red','filled')
+hold on
+geoscatter(lat0,lon0,80,'blue','filled')
+
+% Add labels
+for i = 1:length(names)
+    text(lat(i),lon(i),names{i},'FontSize',8)
+end
+distances = [];
+% Map style
+geobasemap streets
+title('Location Map')
+legend('Main Points','Passing Points')
+%correspond points to data
+marshgate = [data(1,1), data(1,2)];
+ops = [data(2,1), data(2,2)];
+itsu = [data(3,1), data(3,2)];
+waitrose = [data(4,1), data(4,2)];
+mcdonalds = [data(5,1), data(5,2)];
+nero = [data(6,1), data(6,2)];
+greggs = [data(7,1), data(7,2)];
+p1 = [data(8,1), data(8,2)];
+p2 = [data(9,1), data(9,2)];
+p3 = [data(10,1), data(10,2)];
+p4 = [data(11,1), data(11,2)];
+p5 = [data(12,1), data(12,2)];
+p6 = [data(13,1), data(13,2)];
+p7 = [data(14,1), data(14,2)];
+p8 = [data(15,1), data(15,2)];
+p9 = [data(16,1), data(16,2)];
+p10 = [data(17,1), data(17,2)];
+distance = [plot_distance(marshgate, p1);
     plot_distance(p1, ops);
     plot_distance(ops, p2);
     plot_distance(ops, p3);
@@ -742,7 +711,7 @@ function display_map(data, lat, lon, type, names)
     plot_distance(p3, itsu);
     plot_distance(itsu, p5);
     plot_distance(p5, p6);
-    plot_distance(p5, p7);
+    plot_distance(p5, p7)
     plot_distance(p4, p6);
     plot_distance(p6, p9);
     plot_distance(p7, nero);
@@ -753,9 +722,8 @@ function display_map(data, lat, lon, type, names)
     plot_distance(greggs, p10);
     plot_distance(waitrose, p8);
     plot_distance(p8, mcdonalds);
-    plot_distance(mcdonalds, p10);
+    plot_distance(mcdonalds, p10)];
 end
-
 function dist = plot_distance(point1, point2)
 hold on
     lat1 = point1(1);
@@ -763,21 +731,32 @@ hold on
     lat2 = point2(1);
     lon2 = point2(2);
     arclen = distance(lat1,lon1,lat2,lon2);
-    dist = deg2km(arclen)*1000; % Distance in metres
+    dist = deg2km(arclen)*1000; %distance in metres
     midLat = (lat1+lat2)/2;
     midLon = (lon1+lon2)/2;
     
     geoplot([lat1 lat2], [lon1 lon2], 'k-');
     text(midLat,midLon,sprintf('%f m',dist),'FontSize',7, 'FontWeight','normal', 'Color', 'black');
 end
-
-%% main
+%%main
 disconnect = false;
-currentPosition = "Marshgate"; % Starts at Marshgate
+currentPosition = "Marshgate"; %starts at Marshgate
 while ~disconnect
-    question = input("Hi! I'm your very trustworthy navigation robot. What would you like to ask me?\n1) (Traverse) How do I get from ... to ...?\n2) (Info) What is the shortest distance from ... to ...?\n3) (Info) What is the estimated time from ... to ...?\n4) (Info) What is the closest point to A?\n5) (Info) What is the estimated time to the closest point to A?\n6) (Info) What are the three closest points to A?\n7) (Traverse) How do I get back to the nearest waiting point?\n8) (Traverse) Take me anywhere!\n9) (Info)Tell me more about A\n10) (Info) Is A or B closer to me?\n11) [BONUS] Show me a map!\nChoose a question: ");
+    question = input("Hi! I'm your very trustworthy navigation robot." + ...
+        " What would you like to ask me?\n" + ...
+        "        1) (Traverse) How do I get from ... to ...?\n" + ...
+        "        2) (Info) What is the shortest distance from ... to ...?\n" + ...
+        "        3) (Info) What is the estimated time from ... to ...?\n" + ...
+        "        4) (Info) What is the closest point to A?\n" + ...
+        "        5) (Info) What is the estimated time to the closest point to A?\n" + ...
+        "        6) (Info) What are the three closest points to A?\n" + ...
+        "        7) (Traverse) How do I get back to the nearest waiting point?\n" + ...
+        "        8) (Traverse) Take me anywhere!\n" + ...
+        "        9) (Info)Tell me more about A\n" + ...
+        "        10) (Info) Is A or B closer to me?\n" + ...
+        "        11) [BONUS] Show me a map!\n" + ...
+        "        Choose a question: ");
     switch question
-
     case 1
         currentPosition = prompt_question1(graph);
 
@@ -820,3 +799,159 @@ while ~disconnect
        disconnect = true;
     end
 end
+%%CONVERSATION
+%detect places as keywords
+function detected_places = detect_places(graph, sentence)
+
+    detected_places = strings(0);  % string array to store detected place names
+    sentence_clean = lower(strrep(sentence, "'", "")); % handle names like McDonald's
+
+    ptr = graph;
+
+    while ~isempty(ptr)
+        placeName = lower(strrep(ptr.Name, "'", "")); % normalize name
+
+        if contains(sentence_clean, placeName)
+            detected_places(end+1) = ptr.Name; % keep original name
+        end
+
+        ptr = ptr.Next;
+    end
+end
+
+%processes keywords of conversation
+function [conversation_end, currentPosition, mentionedPlaces] = process_speech(graph, tree, names, lat, lon, sentence, currentPosition, startPosition, mentionedPlaces)
+    conversation_end = false;
+    sentence = lower(sentence);
+     detected = detect_places(graph, sentence);
+    if ~isempty(detected)
+        fprintf("ROBOT: ");
+        fprintf("\nI heard %s\n", detected);
+        mentionedPlaces = [mentionedPlaces, detected]; 
+    end
+    if contains(sentence, "westfield")
+        detected = "P5";
+        mentionedPlaces = [mentionedPlaces, detected]; 
+    end
+    %Let's go to ___
+    if ~isempty(mentionedPlaces) && any(contains(sentence, "go to"));
+        fprintf("ROBOT: ");
+        fprintf("\nCalculating route to %s...", detected);
+        currentPosition = question1(graph, currentPosition,  string(mentionedPlaces{end}));
+    end
+    %Closest places
+    if contains(sentence, "closest places") &&  ~isempty(mentionedPlaces)
+        fprintf("ROBOT: ");
+        fprintf("\nFinding closest places...");
+        closest_points = question6(tree, names, lat, lon, currentPosition);
+        for i = 1:length(closest_points)
+        node = closest_points{i};
+            if ismember(node.name, names(1:7)) && ~strcmp(node.name, currentPosition)
+                mentionedPlaces = [mentionedPlaces, node.name];
+            end
+        end
+    end
+    %How far
+     if contains(sentence, "how far") &&  ~isempty(mentionedPlaces)
+        fprintf("ROBOT: ");
+        fprintf("\nCalculating distance to %s...",   mentionedPlaces{end});
+        shortest_distance = question2(graph, currentPosition,   mentionedPlaces{end});
+        fprintf("ROBOT: ");
+        fprintf("\nShortest distance to %s is %.2fm. ", mentionedPlaces{end}, shortest_distance);
+     end
+    %Comparing places
+    if contains(sentence, "closer") && numel(mentionedPlaces) >= 2
+        placeA = mentionedPlaces{end-1}; 
+        placeB = mentionedPlaces{end};
+        fprintf("ROBOT: ");
+        fprintf("\nComparing options: %s vs %s...\n", placeA, placeB);
+        question10(graph, currentPosition, placeA, placeB);
+    end
+    %return time
+    if contains(sentence, "how long") && ~isempty(mentionedPlaces)
+        fprintf("ROBOT: ");
+        fprintf("\nCalculating return time...\n");
+        shortest_distance = question2(graph, currentPosition, startPosition);
+        walking_speed_mps = 1.4; % meters per second
+        shortest_time_mins = round(shortest_distance/walking_speed_mps/60, 0);
+        shortest_time_seconds = rem(shortest_distance/walking_speed_mps, 60);%remaining seconds
+        fprintf("ROBOT: ");
+        fprintf("Estimated time from %s to %s is %.0f minutes %.0f seconds\n", currentPosition, startPosition, shortest_time_mins, shortest_time_seconds);
+    end
+    %return to initial place
+    if contains(sentence, "back")
+        fprintf("ROBOT: ");
+        fprintf("\nReturning to %s...\n", startPosition);
+        currentPosition = question1(graph, currentPosition, startPosition);
+    end
+    %robot goes back to waiting point
+    if contains(sentence, "return")  && contains(sentence, "own")
+        fprintf("ROBOT: ");
+        fprintf("\nFinding nearest waiting point...\n");
+        currentPosition = question7(graph, currentPosition);
+    end
+    %describe place
+    if contains(sentence, "have?") && ~isempty(mentionedPlaces)
+        fprintf("ROBOT: ");
+        fprintf("\nAbout %s and %s...\n", mentionedPlaces{end}, mentionedPlaces{end-1});
+        fprintf("ROBOT: ");
+        question9(mentionedPlaces{end});
+        fprintf("ROBOT: ");
+        question9(mentionedPlaces{end-1});
+    end
+    %bye detected
+    if contains(sentence, "bye ")
+        fprintf("ROBOT: ");
+        fprintf("Goodbye, until next time!");
+        conversation_end = true;
+    end
+end
+
+
+conversation = {
+    0, "Noah", "I haven't eaten all day guys. I might grab something at Waitrose.";
+    3, "Wyatt", "I don't wanna walk too much. How far away is it?";
+    6, "Zi Lin", "Yeah that's way too far. Where do we go now guys?";
+    9, "Keira", "I don't know, whichever is closest?";
+    12, "Noah", "Let's just go to Westfield and find the closest places to us then.";
+    15, "Wyatt", "What do these places even have?";
+    18, "Keira", "Greggs sounds good.";
+    21, "Noah", "I lowkey want Cafe Nero though.";
+    24, "Zi Lin", "Alright, we'll head to whichever is closer.";
+    27, "Noah", "Fine, let's go to Greggs then."
+    30, "Noah", "Man, that was delicious. What time is it now guys?";
+    33, "Wyatt", "Oh my goodness we're gonna be late!";
+    36, "Keira", "How long is it gonna take for us to get back???";
+    39, "Zi Lin", "We gotta run!";
+    42, "Noah", "What about the robot?";
+    45, "Keira", "Can it even return on its own?";
+    48, "Wyatt", "Oh wow it really can.";
+    51, "Zi Lin", "Bye dude!";
+};
+
+startPosition = "Marshgate";
+currentPosition = "Marshgate";
+conversation_end = false;
+fprintf("Robot is listening...\n");
+i = 0;
+start_time = tic;
+mentionedPlaces = {};  % empty cell array to store mentioned places
+while ~conversation_end
+    i = i + 1;
+    timestamp = conversation{i,1};
+    speaker = conversation{i,2};
+    sentence = conversation{i,3};
+
+    % simulate real-time delay
+    while toc(start_time) < timestamp
+    end
+
+    fprintf("\n[%ds] %s: %s\n", timestamp, speaker, sentence);
+
+    % robot processes speech
+    
+    [conversation_end, currentPosition, mentionedPlaces] = process_speech(graph, tree, names, lat, lon, sentence, currentPosition, startPosition, mentionedPlaces);
+
+end
+
+fprintf("\nConversation ended.\n");
