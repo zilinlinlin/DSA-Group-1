@@ -1,9 +1,6 @@
 function move_path(path)
     load("occupancyGridMap.mat");
     
-    % scale factor 1.30979 
-    % conversion = x*sf, (1053-y)*sf
-    
     names = ["Marshgate";"One Pool Street";"Itsu";"Waitrose";"McDonald's";"Caffe Nero";"Greggs";"P1";"P2";"P3";"P4";"P5";"P6";"P7";"P8";"P9";"P10"];
     
     % Data: [x y lat lon type]
