@@ -70,7 +70,7 @@ function move_path(path)
             robot_pos = move_to_target(bw, robot_pos, target);
             p.XData = -0.000006539212292*robot_pos(1) + 51.544470183547240;
             p.YData = 0.000010653595386*robot_pos(2) -0.016781643846851;
-            pause(0.001); % Pause for visualization
+            pause(0.00); % Pause for visualization
         end
     end
     

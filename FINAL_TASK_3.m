@@ -51,7 +51,7 @@ nodes = ["Marshgate", ...
          "Itsu", ...
          "Waitrose", ...
          "McDonald's", ...
-         "Cafe Nero", ...
+         "Caffe Nero", ...
          "Greggs", ...
          "P1", ...
          "P2", ...
@@ -80,8 +80,8 @@ Connections = ["Marshgate", "P1", 44.5263, ...
                "P8", "McDonald's", 59.3594, ...
                "P7", "McDonald's", 149.1913, ...
                "P10", "McDonald's", 52.7022, ...
-               "P7", "Cafe Nero", 147.0308, ...
-               "P9", "Cafe Nero", 57.1090, ...
+               "P7", "Caffe Nero", 147.0308, ...
+               "P9", "Caffe Nero", 57.1090, ...
                "P9", "Greggs", 38.2287, ...
                "P10", "Greggs", 46.5749];
 graph = [];
@@ -122,7 +122,7 @@ lat = data(:,1);
 lon = data(:,2);
 type = data(:,3);
 
-names = ["Marshgate";"One Pool Street";"Itsu";"Waitrose";"McDonald's";"Cafe Nero";"Greggs";"P1";"P2";"P3";"P4";"P5";"P6";"P7";"P8";"P9";"P10"];
+names = ["Marshgate";"One Pool Street";"Itsu";"Waitrose";"McDonald's";"Caffe Nero";"Greggs";"P1";"P2";"P3";"P4";"P5";"P6";"P7";"P8";"P9";"P10"];
 
 %%Initialise KD Tree
 function node = build_kdtree(points, names, depth)
@@ -355,6 +355,8 @@ function currentPosition = question1(graph, startNode, endNode)
     end
     fprintf("reached %s", endNode);
     currentPosition = endNode;
+
+    move_path(path)
 end
 function currentPosition = prompt_question1(graph)
     startNode = string(input("How do I get from... ","s"));
@@ -565,7 +567,7 @@ function currentPosition = prompt_question8(graph, currentPosition)
     fprintf("You are currently at %s\n", currentPosition);
     random_choice = randi([1 7]);
     disp(random_choice);
-    places = ["Marshgate", "One Pool Street", "Itsu", "Waitrose", "McDonald's", "Cafe Nero", "Greggs", "P1", "P2", "P3", "P4", "P5", "P6", "P7","P8", "P9", "P10"];
+    places = ["Marshgate", "One Pool Street", "Itsu", "Waitrose", "McDonald's", "Caffe Nero", "Greggs", "P1", "P2", "P3", "P4", "P5", "P6", "P7","P8", "P9", "P10"];
     random_place = places(random_choice);
     while random_place == currentPosition %makes sure it doesnt choose same place
         rng("shuffle");
@@ -617,8 +619,8 @@ switch target_name
         disp('- Vibe: Fast, affordable, and incredibly convenient for a quick bite or late-night fuel.');
         disp('-------------------------');
         
-    case "Cafe Nero"
-        disp('--- Cafe Nero Summary ---');
+    case "Caffe Nero"
+        disp('--- Caffe Nero Summary ---');
         disp('- Type: Popular European-style coffee house chain.');
         disp('- Offerings: Premium espresso drinks, hot paninis, and sweet pastries.');
         disp('- Vibe: Cozy and relaxed. A great off-campus spot for a caffeine fix or pulling out a laptop to study.');
@@ -916,7 +918,7 @@ conversation = {
     12, "Noah", "Let's just go to Westfield and find the closest places to us then.";
     15, "Wyatt", "What do these places even have?";
     18, "Keira", "Greggs sounds good.";
-    21, "Noah", "I lowkey want Cafe Nero though.";
+    21, "Noah", "I lowkey want Caffe Nero though.";
     24, "Zi Lin", "Alright, we'll head to whichever is closer.";
     27, "Noah", "Fine, let's go to Greggs then."
     30, "Noah", "Man, that was delicious. What time is it now guys?";
