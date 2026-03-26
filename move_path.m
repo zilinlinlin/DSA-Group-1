@@ -34,6 +34,20 @@ function move_path(path)
     
     lat0 = lat(type==0);
     lon0 = lon(type==0);
+
+    obstacle_dest = [288 1171
+                    917 778 
+                    362 758
+                    559 940
+                    ];
+
+    car_1 = obstacle_dest(1,:);
+    car_2 = obstacle_dest(2,:);
+    car_3 = obstacle_dest(3,:);
+
+    car_1_target = 4;
+    car_2_target = 4;
+    car_3_target = 4;
     
     % Create geographic plot
     geoscatter(lat1,lon1,80,'red','filled')
@@ -52,7 +66,13 @@ function move_path(path)
     robot_pos = data(idx_from, 1:2);
     [robot_pos(1), robot_pos(2)] = deal(robot_pos(2), robot_pos(1));
 
-    p = geoscatter(-0.000006539212292*robot_pos(1) + 51.544470183547240, 0.000010653595386*robot_pos(2) -0.016781643846851, 120,'green','filled');
+    r = geoscatter(-0.000006539212292*robot_pos(1) + 51.544470183547240, 0.000010653595386*robot_pos(2) -0.016781643846851, 120,'green','filled');
+    c1 = geoscatter(-0.000006539212292*car_1(1) + 51.544470183547240, 0.000010653595386*car_1(2) -0.016781643846851, 80,'magenta','filled');
+    c2 = geoscatter(-0.000006539212292*car_2(1) + 51.544470183547240, 0.000010653595386*car_2(2) -0.016781643846851, 80,'magenta','filled');
+    c3 = geoscatter(-0.000006539212292*car_3(1) + 51.544470183547240, 0.000010653595386*car_3(2) -0.016781643846851, 80,'magenta','filled');
+
+
+    legend('Main Points','Passing Points','Robot','Obstacles')
     
     for i = 1:length(path)-1   
         idx_from = names == path(i);
@@ -63,14 +83,54 @@ function move_path(path)
         
         [robot_pos(1), robot_pos(2)] = deal(robot_pos(2), robot_pos(1));
         [target(1), target(2)] = deal(target(2), target(1));
-                
-        legend('Main Points','Passing Points', 'Robot')
     
         while ~isequal(robot_pos, target)
+            if isequal(obstacle_dest(car_1_target,:), car_1)
+                if car_1_target == 4
+                    car_1_target = randi(4);
+                else
+                    car_1_target = 4;
+                end
+            end
+
+            if isequal(obstacle_dest(car_2_target,:), car_2)
+                if car_2_target == 4
+                    car_2_target = randi(4);
+                else
+                    car_2_target = 4;
+                end
+            end
+
+            if isequal(obstacle_dest(car_3_target,:), car_3)
+                if car_3_target == 4
+                    car_3_target = randi(4);
+                else
+                    car_3_target = 4;
+                end
+            end
+
+            car_1 = move_to_target(bw, car_1, obstacle_dest(car_1_target,:));
+            c1.XData = -0.000006539212292*car_1(1) + 51.544470183547240;
+            c1.YData = 0.000010653595386*car_1(2) -0.016781643846851;
+            
+            car_2 = move_to_target(bw, car_2, obstacle_dest(car_2_target,:));
+            c2.XData = -0.000006539212292*car_2(1) + 51.544470183547240;
+            c2.YData = 0.000010653595386*car_2(2) -0.016781643846851;
+
+            car_3 = move_to_target(bw, car_3, obstacle_dest(car_3_target,:));
+            c3.XData = -0.000006539212292*car_3(1) + 51.544470183547240;
+            c3.YData = 0.000010653595386*car_3(2) -0.016781643846851;
+
+            bw(car_3(2), car_3(1)) = 1;
+            bw(car_2(2), car_2(1)) = 1;
+            bw(car_1(2), car_1(1)) = 1;
+
             robot_pos = move_to_target(bw, robot_pos, target);
-            p.XData = -0.000006539212292*robot_pos(1) + 51.544470183547240;
-            p.YData = 0.000010653595386*robot_pos(2) -0.016781643846851;
-            pause(0.00); % Pause for visualization
+            r.XData = -0.000006539212292*robot_pos(1) + 51.544470183547240;
+            r.YData = 0.000010653595386*robot_pos(2) -0.016781643846851;
+
+            drawnow limitrate
+            pause(0.00); % Pause for a brief moment to visualize the movement
         end
     end
     
