@@ -1,5 +1,6 @@
-%plotting first data log path
+%plotting second data log path
+load('walk2.mat')
 figure;
 geobasemap("streets");
 geoplot(Position.latitude, Position.longitude);
-title("First path of data");
+title("Second path of data");
