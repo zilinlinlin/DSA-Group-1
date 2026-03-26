@@ -129,6 +129,10 @@ function move_path(path)
             r.XData = -0.000006539212292*robot_pos(1) + 51.544470183547240;
             r.YData = 0.000010653595386*robot_pos(2) -0.016781643846851;
 
+            bw(car_3(2), car_3(1)) = 0;
+            bw(car_2(2), car_2(1)) = 0;
+            bw(car_1(2), car_1(1)) = 0;
+
             drawnow limitrate
             pause(0.00); % Pause for a brief moment to visualize the movement
         end
